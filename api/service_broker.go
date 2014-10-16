@@ -5,7 +5,7 @@ import "errors"
 type ServiceBroker interface {
 	Services() []Service
 
-	Provision(instanceID string, params map[string]string) error
+	Provision(instanceID, planID string) error
 	Deprovision(instanceID string) error
 
 	Bind(instanceID, bindingID string) (interface{}, error)

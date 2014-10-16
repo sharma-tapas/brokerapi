@@ -36,9 +36,15 @@ func New(serviceBroker ServiceBroker, httpLogger *log.Logger, brokerLogger *gost
 
 		serviceDetails := make(map[string]string)
 		body, _ := ioutil.ReadAll(req.Body)
+
 		json.Unmarshal(body, &serviceDetails)
 
-		err := serviceBroker.Provision(instanceID, serviceDetails)
+		//As the downstream provision objects are required to know about the planID we are explicitly sending it.
+		//In the future we may create a ParamObjects class and pass that instead. Right now we are sending data on
+		//a need to know basis.
+
+		planID, _ := serviceDetails["plan_id"]
+		err := serviceBroker.Provision(instanceID, planID)
 
 		if err != nil {
 			switch err {
