@@ -29,9 +29,9 @@ var _ = Describe("Service Broker API", func() {
 			path := "/v2/service_instances/" + instanceID
 
 			request, _ := http.NewRequest("PUT", path, strings.NewReader(`{
-          "planID":           "`+params["planID"]+`",
-          "organizationGUID": "`+params["organizationGUID"]+`",
-          "spaceGUID":        "`+params["spaceGUID"]+`"
+          "plan_id":           "`+params["plan_id"]+`",
+          "organization_guid": "`+params["organization_guid"]+`",
+          "space_guid":        "`+params["space_guid"]+`"
       }`))
 			request.Header.Add("Content-Type", "application/json")
 			request.SetBasicAuth("username", "password")
@@ -152,19 +152,22 @@ var _ = Describe("Service Broker API", func() {
 		Describe("provisioning", func() {
 			var instanceID string
 			var params map[string]string
+			var planID string
 
 			BeforeEach(func() {
 				instanceID = uniqueInstanceID()
+				planID = "my-lovely-plan"
+
 				params = map[string]string{
-					"planID":           "plan-id",
-					"organizationGUID": "organization-guid",
-					"spaceGUID":        "space-guid",
+					"plan_id":           planID,
+					"organization_guid": "my-organization-guid",
+					"space_guid":        "my-space-guid",
 				}
 			})
 
 			It("calls Provision on the service broker with all params", func() {
 				makeInstanceProvisioningRequest(instanceID, params)
-				Expect(fakeServiceBroker.Params).To(Equal(params))
+				Expect(fakeServiceBroker.PlanID).To(Equal(planID))
 			})
 
 			It("calls Provision on the service broker with the instance id", func() {
