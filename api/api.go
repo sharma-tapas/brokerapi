@@ -75,8 +75,17 @@ func New(serviceBroker ServiceBroker, httpLogger *log.Logger, brokerLogger lager
 
 		err := serviceBroker.Deprovision(instanceID)
 		if err != nil {
-			logger.Error("instance-missing", err)
-			r.JSON(410, EmptyResponse{})
+			switch err {
+			case ErrInstanceDoesNotExist:
+				logger.Error("instance-missing", err)
+				r.JSON(410, EmptyResponse{})
+			default:
+				logger.Error("unknown-error", err)
+				r.JSON(500, ErrorResponse{
+					Description: "an unexpected error occurred",
+				})
+			}
+
 			return
 		}
 
