@@ -3,8 +3,8 @@ package fakes
 import "github.com/pivotal-cf/brokerapi"
 
 type FakeServiceBroker struct {
-	ProvisionDetails   brokerapi.ProvisionDetails
-	UpdateDetails      brokerapi.UpdateDetails
+	ProvisionDetails   map[string]interface{}
+	UpdateDetails      map[string]interface{}
 	DeprovisionDetails brokerapi.DeprovisionDetails
 
 	ProvisionedInstanceIDs   []string
@@ -81,7 +81,7 @@ func (fakeBroker *FakeServiceBroker) Services() []brokerapi.Service {
 	}
 }
 
-func (fakeBroker *FakeServiceBroker) Provision(instanceID string, details brokerapi.ProvisionDetails, asyncAllowed bool) (brokerapi.ProvisionedServiceSpec, error) {
+func (fakeBroker *FakeServiceBroker) Provision(instanceID string, details map[string]interface{}, asyncAllowed bool) (brokerapi.ProvisionedServiceSpec, error) {
 	fakeBroker.BrokerCalled = true
 
 	if fakeBroker.ProvisionError != nil {
@@ -101,7 +101,7 @@ func (fakeBroker *FakeServiceBroker) Provision(instanceID string, details broker
 	return brokerapi.ProvisionedServiceSpec{DashboardURL: fakeBroker.DashboardURL}, nil
 }
 
-func (fakeBroker *FakeAsyncServiceBroker) Provision(instanceID string, details brokerapi.ProvisionDetails, asyncAllowed bool) (brokerapi.ProvisionedServiceSpec, error) {
+func (fakeBroker *FakeAsyncServiceBroker) Provision(instanceID string, details map[string]interface{}, asyncAllowed bool) (brokerapi.ProvisionedServiceSpec, error) {
 	fakeBroker.BrokerCalled = true
 
 	if fakeBroker.ProvisionError != nil {
@@ -121,7 +121,7 @@ func (fakeBroker *FakeAsyncServiceBroker) Provision(instanceID string, details b
 	return brokerapi.ProvisionedServiceSpec{IsAsync: fakeBroker.ShouldProvisionAsync, DashboardURL: fakeBroker.DashboardURL}, nil
 }
 
-func (fakeBroker *FakeAsyncOnlyServiceBroker) Provision(instanceID string, details brokerapi.ProvisionDetails, asyncAllowed bool) (brokerapi.ProvisionedServiceSpec, error) {
+func (fakeBroker *FakeAsyncOnlyServiceBroker) Provision(instanceID string, details map[string]interface{}, asyncAllowed bool) (brokerapi.ProvisionedServiceSpec, error) {
 	fakeBroker.BrokerCalled = true
 
 	if fakeBroker.ProvisionError != nil {
@@ -145,7 +145,7 @@ func (fakeBroker *FakeAsyncOnlyServiceBroker) Provision(instanceID string, detai
 	return brokerapi.ProvisionedServiceSpec{IsAsync: true, DashboardURL: fakeBroker.DashboardURL}, nil
 }
 
-func (fakeBroker *FakeServiceBroker) Update(instanceID string, details brokerapi.UpdateDetails, asyncAllowed bool) (brokerapi.IsAsync, error) {
+func (fakeBroker *FakeServiceBroker) Update(instanceID string, details map[string]interface{}, asyncAllowed bool) (brokerapi.IsAsync, error) {
 	fakeBroker.BrokerCalled = true
 
 	if fakeBroker.UpdateError != nil {

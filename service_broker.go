@@ -1,33 +1,22 @@
 package brokerapi
 
-import (
-	"encoding/json"
-	"errors"
-)
+import "errors"
 
 type ServiceBroker interface {
 	Services() []Service
 
-	Provision(instanceID string, details ProvisionDetails, asyncAllowed bool) (ProvisionedServiceSpec, error)
+	Provision(instanceID string, details map[string]interface{}, asyncAllowed bool) (ProvisionedServiceSpec, error)
 	Deprovision(instanceID string, details DeprovisionDetails, asyncAllowed bool) (IsAsync, error)
 
 	Bind(instanceID, bindingID string, details BindDetails) (Binding, error)
 	Unbind(instanceID, bindingID string, details UnbindDetails) error
 
-	Update(instanceID string, details UpdateDetails, asyncAllowed bool) (IsAsync, error)
+	Update(instanceID string, details map[string]interface{}, asyncAllowed bool) (IsAsync, error)
 
 	LastOperation(instanceID string) (LastOperation, error)
 }
 
 type IsAsync bool
-
-type ProvisionDetails struct {
-	ServiceID        string          `json:"service_id"`
-	PlanID           string          `json:"plan_id"`
-	OrganizationGUID string          `json:"organization_guid"`
-	SpaceGUID        string          `json:"space_guid"`
-	RawParameters    json.RawMessage `json:"parameters,omitempty"`
-}
 
 type ProvisionedServiceSpec struct {
 	IsAsync      bool
@@ -55,13 +44,6 @@ type UnbindDetails struct {
 type DeprovisionDetails struct {
 	PlanID    string `json:"plan_id"`
 	ServiceID string `json:"service_id"`
-}
-
-type UpdateDetails struct {
-	ServiceID      string                 `json:"service_id"`
-	PlanID         string                 `json:"plan_id"`
-	Parameters     map[string]interface{} `json:"parameters"`
-	PreviousValues PreviousValues         `json:"previous_values"`
 }
 
 type PreviousValues struct {

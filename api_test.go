@@ -209,45 +209,38 @@ var _ = Describe("Service Broker API", func() {
 					"plan_id":           "plan-id",
 					"organization_guid": "organization-guid",
 					"space_guid":        "space-guid",
+					"parameters": map[string]interface{}{
+						"string": "some-string",
+						"number": 1.0,
+						"object": map[string]interface{}{
+							"name": "some-name",
+						},
+						"array": []interface{}{"a", "b", "c"},
+					},
 				}
 			})
 
 			It("calls Provision on the service broker with all params", func() {
 				makeInstanceProvisioningRequest(instanceID, provisionDetails, "")
-				Expect(fakeServiceBroker.ProvisionDetails).To(Equal(brokerapi.ProvisionDetails{
-					ServiceID:        "service-id",
-					PlanID:           "plan-id",
-					OrganizationGUID: "organization-guid",
-					SpaceGUID:        "space-guid",
+				Expect(fakeServiceBroker.ProvisionDetails).To(Equal(map[string]interface{}{
+					"service_id":        "service-id",
+					"plan_id":           "plan-id",
+					"organization_guid": "organization-guid",
+					"space_guid":        "space-guid",
+					"parameters": map[string]interface{}{
+						"string": "some-string",
+						"number": 1.0,
+						"object": map[string]interface{}{
+							"name": "some-name",
+						},
+						"array": []interface{}{"a", "b", "c"},
+					},
 				}))
 			})
 
 			It("calls Provision on the service broker with the instance id", func() {
 				makeInstanceProvisioningRequest(instanceID, provisionDetails, "")
 				Expect(fakeServiceBroker.ProvisionedInstanceIDs).To(ContainElement(instanceID))
-			})
-
-			Context("when there are arbitrary params", func() {
-				BeforeEach(func() {
-					provisionDetails["parameters"] = map[string]interface{}{
-						"string": "some-string",
-						"number": 1,
-						"object": struct{ Name string }{"some-name"},
-						"array":  []interface{}{"a", "b", "c"},
-					}
-				})
-
-				It("calls Provision on the service broker with all params", func() {
-					rawParams := `{
-						"string":"some-string",
-						"number":1,
-						"object": { "Name": "some-name" },
-						"array": [ "a", "b", "c" ]
-					}`
-
-					makeInstanceProvisioningRequest(instanceID, provisionDetails, "")
-					Expect(string(fakeServiceBroker.ProvisionDetails.RawParameters)).To(MatchJSON(rawParams))
-				})
 			})
 
 			Context("when the instance does not exist", func() {
@@ -399,11 +392,19 @@ var _ = Describe("Service Broker API", func() {
 					It("calls ProvisionAsync on the service broker", func() {
 						acceptsIncomplete := true
 						makeInstanceProvisioningRequestWithAcceptsIncomplete(instanceID, provisionDetails, acceptsIncomplete)
-						Expect(fakeServiceBroker.ProvisionDetails).To(Equal(brokerapi.ProvisionDetails{
-							ServiceID:        "service-id",
-							PlanID:           "plan-id",
-							OrganizationGUID: "organization-guid",
-							SpaceGUID:        "space-guid",
+						Expect(fakeServiceBroker.ProvisionDetails).To(Equal(map[string]interface{}{
+							"service_id":        "service-id",
+							"plan_id":           "plan-id",
+							"organization_guid": "organization-guid",
+							"space_guid":        "space-guid",
+							"parameters": map[string]interface{}{
+								"string": "some-string",
+								"number": 1.0,
+								"object": map[string]interface{}{
+									"name": "some-name",
+								},
+								"array": []interface{}{"a", "b", "c"},
+							},
 						}))
 
 						Expect(fakeServiceBroker.ProvisionedInstanceIDs).To(ContainElement(instanceID))
@@ -503,13 +504,13 @@ var _ = Describe("Service Broker API", func() {
 		Describe("updating", func() {
 			var (
 				instanceID  string
-				details     brokerapi.UpdateDetails
+				details     map[string]interface{}
 				queryString string
 
 				response *testflight.Response
 			)
 
-			makeInstanceUpdateRequest := func(instanceID string, details brokerapi.UpdateDetails, queryString string) *testflight.Response {
+			makeInstanceUpdateRequest := func(instanceID string, details map[string]interface{}, queryString string) *testflight.Response {
 				response := &testflight.Response{}
 
 				testflight.WithServer(brokerAPI, func(r *testflight.Requester) {
@@ -529,15 +530,16 @@ var _ = Describe("Service Broker API", func() {
 
 			BeforeEach(func() {
 				instanceID = uniqueInstanceID()
-				details = brokerapi.UpdateDetails{
-					ServiceID:  "some-service-id",
-					PlanID:     "new-plan",
-					Parameters: map[string]interface{}{"new-param": "new-param-value"},
-					PreviousValues: brokerapi.PreviousValues{
-						PlanID:    "old-plan",
-						ServiceID: "service-id",
-						OrgID:     "org-id",
-						SpaceID:   "space-id",
+				details = map[string]interface{}{
+					"service_id": "some-service-id",
+					"plan_id":    "new-plan",
+					"parameters": map[string]interface{}{
+						"new-param": "new-param-value"},
+					"previous_values": map[string]interface{}{
+						"plan_id":    "old-plan",
+						"service_id": "service-id",
+						"org_id":     "org-id",
+						"space_id":   "space-id",
 					},
 				}
 			})

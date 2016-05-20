@@ -81,7 +81,7 @@ func (h serviceBrokerHandler) provision(w http.ResponseWriter, req *http.Request
 		instanceIDLogKey: instanceID,
 	})
 
-	var details ProvisionDetails
+	var details map[string]interface{}
 	if err := json.NewDecoder(req.Body).Decode(&details); err != nil {
 		logger.Error(invalidServiceDetailsErrorKey, err)
 		h.respond(w, statusUnprocessableEntity, ErrorResponse{
@@ -143,7 +143,7 @@ func (h serviceBrokerHandler) update(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	instanceID := vars["instance_id"]
 
-	var details UpdateDetails
+	var details map[string]interface{}
 	if err := json.NewDecoder(req.Body).Decode(&details); err != nil {
 		h.logger.Error(invalidServiceDetailsErrorKey, err)
 		h.respond(w, statusUnprocessableEntity, ErrorResponse{
