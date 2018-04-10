@@ -40,11 +40,15 @@ const (
 	apiVersionInvalidKey          = "broker-api-version-invalid"
 	serviceIdMissingKey           = "service-id-missing"
 	planIdMissingKey              = "plan-id-missing"
+	organizationGUIDMissingKey    = "organization-guid-missing"
+	spaceGUIDMissingKey           = "space-guid-missing"
 )
 
 var (
-	serviceIdError = errors.New("service_id missing")
-	planIdError    = errors.New("plan_id missing")
+	serviceIdError        = errors.New("service_id missing")
+	planIdError           = errors.New("plan_id missing")
+	organizationGUIDError = errors.New("organization_guid missing")
+	spaceGUIDError        = errors.New("space_guid missing")
 )
 
 type BrokerCredentials struct {
@@ -110,11 +114,52 @@ func (h serviceBrokerHandler) provision(w http.ResponseWriter, req *http.Request
 		instanceIDLogKey: instanceID,
 	})
 
+	if err := checkBrokerAPIVersionHdr(req); err != nil {
+		h.respond(w, http.StatusPreconditionFailed, ErrorResponse{
+			Description: err.Error(),
+		})
+		logger.Error(apiVersionInvalidKey, err)
+		return
+	}
+
 	var details ProvisionDetails
+
 	if err := json.NewDecoder(req.Body).Decode(&details); err != nil {
 		logger.Error(invalidServiceDetailsErrorKey, err)
 		h.respond(w, http.StatusUnprocessableEntity, ErrorResponse{
 			Description: err.Error(),
+		})
+		return
+	}
+
+	if details.ServiceID == "" {
+		logger.Error(serviceIdMissingKey, serviceIdError)
+		h.respond(w, http.StatusBadRequest, ErrorResponse{
+			Description: serviceIdError.Error(),
+		})
+		return
+	}
+
+	if details.PlanID == "" {
+		logger.Error(planIdMissingKey, planIdError)
+		h.respond(w, http.StatusBadRequest, ErrorResponse{
+			Description: planIdError.Error(),
+		})
+		return
+	}
+
+	if details.SpaceGUID == "" {
+		logger.Error(spaceGUIDMissingKey, spaceGUIDError)
+		h.respond(w, http.StatusBadRequest, ErrorResponse{
+			Description: spaceGUIDError.Error(),
+		})
+		return
+	}
+
+	if details.OrganizationGUID == "" {
+		logger.Error(organizationGUIDMissingKey, organizationGUIDError)
+		h.respond(w, http.StatusBadRequest, ErrorResponse{
+			Description: organizationGUIDError.Error(),
 		})
 		return
 	}
