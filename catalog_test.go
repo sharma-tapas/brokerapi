@@ -17,12 +17,13 @@ package brokerapi_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"reflect"
 	"sync"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/pivotal-cf/brokerapi"
+	"github.com/sharma-tapas/brokerapi"
 )
 
 var _ = Describe("Catalog", func() {
@@ -43,6 +44,10 @@ var _ = Describe("Catalog", func() {
 						Secret:      "dashboardsecret",
 						RedirectURI: "the.dashboa.rd",
 					},
+					AdditionalMetadata: map[string]interface{}{
+						"baz": 1,
+						"foo": "bar",
+					},
 				}
 				jsonString := `{
 					"id":"ID-1",
@@ -57,11 +62,15 @@ var _ = Describe("Catalog", func() {
 						"secret":"dashboardsecret",
 						"redirect_uri":"the.dashboa.rd"
 					},
-					"metadata":{
-
-					}
+					"metadata":{},
+					"foo": "bar",
+					"baz": 1
 				}`
+				b, _ := json.Marshal(service)
+				fmt.Println(string(b))
 				Expect(json.Marshal(service)).To(MatchJSON(jsonString))
+				By("not mutating the AdditionalMetadata during custom JSON marshalling")
+				Expect(len(service.AdditionalMetadata)).To(Equal(2))
 			})
 		})
 
@@ -85,6 +94,10 @@ var _ = Describe("Catalog", func() {
 					Secret:      "dashboardsecret",
 					RedirectURI: "the.dashboa.rd",
 				},
+				AdditionalMetadata: map[string]interface{}{
+					"baz": 1,
+					"foo": "bar",
+				},
 			}
 			jsonString := `{
 				"id":"ID-1",
@@ -100,11 +113,13 @@ var _ = Describe("Catalog", func() {
 					"secret":"dashboardsecret",
 					"redirect_uri":"the.dashboa.rd"
 				},
-				"metadata":{
-
-				}
+				"metadata":{},
+				"foo": "bar",
+				"baz": 1
 			}`
 			Expect(json.Marshal(service)).To(MatchJSON(jsonString))
+			By("not mutating the AdditionalMetadata during custom JSON marshalling")
+			Expect(len(service.AdditionalMetadata)).To(Equal(2))
 		})
 	})
 

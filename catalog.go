@@ -36,6 +36,7 @@ type Service struct {
 	Requires             []RequiredPermission    `json:"requires,omitempty"`
 	Metadata             *ServiceMetadata        `json:"metadata,omitempty"`
 	DashboardClient      *ServiceDashboardClient `json:"dashboard_client,omitempty"`
+	AdditionalMetadata   map[string]interface{}
 }
 
 type ServiceDashboardClient struct {
@@ -220,6 +221,49 @@ func (sm *ServiceMetadata) UnmarshalJSON(data []byte) error {
 
 	if len(additionalMetadata) > 0 {
 		sm.AdditionalMetadata = additionalMetadata
+	}
+	return nil
+}
+
+func (s Service) MarshalJSON() ([]byte, error) {
+	type Alias Service
+
+	b, err := json.Marshal((Alias)(s))
+	if err != nil {
+		return []byte{}, errors.Wrap(err, "unmarshallable content in AdditionalMetadata")
+	}
+
+	var m map[string]interface{}
+	json.Unmarshal(b, &m)
+	delete(m, additionalMetadataName)
+
+	for k, v := range s.AdditionalMetadata {
+		m[k] = v
+	}
+	return json.Marshal(m)
+}
+
+func (s *Service) UnmarshalJSON(data []byte) error {
+	type Alias Service
+
+	if err := json.Unmarshal(data, (*Alias)(s)); err != nil {
+		return err
+	}
+
+	additionalMetadata := map[string]interface{}{}
+	if err := json.Unmarshal(data, &additionalMetadata); err != nil {
+		return err
+	}
+
+	for _, jsonName := range GetJsonNames(reflect.ValueOf(s).Elem()) {
+		if jsonName == additionalMetadataName {
+			continue
+		}
+		delete(additionalMetadata, jsonName)
+	}
+
+	if len(additionalMetadata) > 0 {
+		s.AdditionalMetadata = additionalMetadata
 	}
 	return nil
 }

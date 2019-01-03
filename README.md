@@ -1,10 +1,10 @@
 # brokerapi
 
-[![Build Status](https://travis-ci.org/pivotal-cf/brokerapi.svg?branch=master)](https://travis-ci.org/pivotal-cf/brokerapi)
+[![Build Status](https://travis-ci.org/sharma-tapas/brokerapi.svg?branch=master)](https://travis-ci.org/sharma-tapas/brokerapi)
 
 A Go package for building [V2 Open Service Broker API](https://github.com/openservicebrokerapi/servicebroker/) compliant Service Brokers.
 
-## [Docs](https://godoc.org/github.com/pivotal-cf/brokerapi)
+## [Docs](https://godoc.org/github.com/sharma-tapas/brokerapi)
 
 ## Dependencies
 
@@ -16,9 +16,9 @@ We use [dep](https://github.com/golang/dep) to manager our dependencies. Use `de
 
 ## Usage
 
-`brokerapi` defines a [`ServiceBroker`](https://godoc.org/github.com/pivotal-cf/brokerapi#ServiceBroker) interface. Pass an implementation of this to [`brokerapi.New`](https://godoc.org/github.com/pivotal-cf/brokerapi#New), which returns an `http.Handler` that you can use to serve handle HTTP requests.
+`brokerapi` defines a [`ServiceBroker`](https://godoc.org/github.com/sharma-tapas/brokerapi#ServiceBroker) interface. Pass an implementation of this to [`brokerapi.New`](https://godoc.org/github.com/sharma-tapas/brokerapi#New), which returns an `http.Handler` that you can use to serve handle HTTP requests.
 
-Alternatively, if you already have a `*mux.Router` that you want to attach service broker routes to, you can use [`brokerapi.AttachRoutes`](https://godoc.org/github.com/pivotal-cf/brokerapi#AttachRoutes).
+Alternatively, if you already have a `*mux.Router` that you want to attach service broker routes to, you can use [`brokerapi.AttachRoutes`](https://godoc.org/github.com/sharma-tapas/brokerapi#AttachRoutes).
 
 ## Error types
 
@@ -30,4 +30,4 @@ Alternatively, if you already have a `*mux.Router` that you want to attach servi
 
 ## Example Service Broker
 
-You can see the [cf-redis](https://github.com/pivotal-cf/cf-redis-broker/blob/2f0e9a8ebb1012a9be74bbef2d411b0b3b60352f/broker/broker.go) service broker uses the BrokerAPI package to create a service broker for Redis.
+You can see the [cf-redis](https://github.com/sharma-tapas/cf-redis-broker/blob/2f0e9a8ebb1012a9be74bbef2d411b0b3b60352f/broker/broker.go) service broker uses the BrokerAPI package to create a service broker for Redis.

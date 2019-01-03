@@ -31,8 +31,8 @@ import (
 	"github.com/drewolson/testflight"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/pivotal-cf/brokerapi"
-	"github.com/pivotal-cf/brokerapi/fakes"
+	"github.com/sharma-tapas/brokerapi"
+	"github.com/sharma-tapas/brokerapi/fakes"
 )
 
 var _ = Describe("Service Broker API", func() {

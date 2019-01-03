@@ -24,7 +24,7 @@ import (
 
 	"code.cloudfoundry.org/lager"
 	"github.com/gorilla/mux"
-	"github.com/pivotal-cf/brokerapi/auth"
+	"github.com/sharma-tapas/brokerapi/auth"
 )
 
 const (
