@@ -251,12 +251,12 @@ var _ = Describe("Service Broker API", func() {
 		})
 	})
 
-	Describe("OriginatingIdentityHeader", func(){
+	Describe("OriginatingIdentityHeader", func() {
 
 		var (
 			fakeServiceBroker *fakes.AutoFakeServiceBroker
-			req *http.Request
-			testServer *httptest.Server
+			req               *http.Request
+			testServer        *httptest.Server
 		)
 
 		BeforeEach(func() {
@@ -275,8 +275,8 @@ var _ = Describe("Service Broker API", func() {
 			testServer.Close()
 		})
 
-		When("X-Broker-API-Originating-Identity is passed", func(){
-			It("Adds it to the context", func(){
+		When("X-Broker-API-Originating-Identity is passed", func() {
+			It("Adds it to the context", func() {
 				originatingIdentity := "Originating Identity Name"
 				req.Header.Add("X-Broker-API-Originating-Identity", originatingIdentity)
 
@@ -289,14 +289,78 @@ var _ = Describe("Service Broker API", func() {
 
 			})
 		})
-		When("X-Broker-API-Originating-Identity is not passed", func(){
-			It("Adds empty originatingIdentity to the context", func(){
+		When("X-Broker-API-Originating-Identity is not passed", func() {
+			It("Adds empty originatingIdentity to the context", func() {
 				_, err := http.DefaultClient.Do(req)
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(fakeServiceBroker.ServicesCallCount()).To(Equal(1), "Services was not called")
 				ctx := fakeServiceBroker.ServicesArgsForCall(0)
 				Expect(ctx.Value("originatingIdentity")).To(Equal(""))
+			})
+		})
+	})
+
+	Describe("XRegionHeader", func() {
+
+		var (
+			fakeServiceBroker *fakes.AutoFakeServiceBroker
+			req               *http.Request
+			testServer        *httptest.Server
+		)
+
+		BeforeEach(func() {
+			fakeServiceBroker = new(fakes.AutoFakeServiceBroker)
+			brokerAPI = brokerapi.New(fakeServiceBroker, brokerLogger, credentials)
+
+			testServer = httptest.NewServer(brokerAPI)
+			var err error
+			req, err = http.NewRequest("GET", testServer.URL+"/v2/catalog", nil)
+			Expect(err).NotTo(HaveOccurred())
+			req.Header.Add("X-Broker-API-Version", "2.14")
+			req.SetBasicAuth(credentials.Username, credentials.Password)
+		})
+
+		AfterEach(func() {
+			testServer.Close()
+		})
+
+		When("X-Region is passed", func() {
+			It("Adds it to the context", func() {
+				region := "India"
+				req.Header.Add("X-Bluemix-Region", region)
+
+				_, err := http.DefaultClient.Do(req)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(fakeServiceBroker.ServicesCallCount()).To(Equal(1), "Services was not called")
+				ctx := fakeServiceBroker.ServicesArgsForCall(0)
+				Expect(ctx.Value("X-Region")).To(Equal(region))
+
+			})
+		})
+		When("X-Region is passed", func() {
+			It("Adds it to the context", func() {
+				region := "India"
+				req.Header.Add("X-Region", region)
+
+				_, err := http.DefaultClient.Do(req)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(fakeServiceBroker.ServicesCallCount()).To(Equal(1), "Services was not called")
+				ctx := fakeServiceBroker.ServicesArgsForCall(0)
+				Expect(ctx.Value("X-Region")).To(Equal(region))
+
+			})
+		})
+		When("X-Region is not passed", func() {
+			It("Adds empty X-Region to the context", func() {
+				_, err := http.DefaultClient.Do(req)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(fakeServiceBroker.ServicesCallCount()).To(Equal(1), "Services was not called")
+				ctx := fakeServiceBroker.ServicesArgsForCall(0)
+				Expect(ctx.Value("X-Region")).To(Equal(""))
 			})
 		})
 	})
